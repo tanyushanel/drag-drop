@@ -32,11 +32,34 @@ tasksListElement.addEventListener(`dragover`, (evt) => {
     return;
   }
 
-  // find elem to insert before 
-  const nextElement = (currentElement === activeElement.nextElementSibling) ?
-      currentElement.nextElementSibling :
-      currentElement;
+  // evt.clientY — cursor vertical coordinate during event
+  const nextElement = getNextElement(evt.clientY, currentElement);
+
+  // check if need to replace elem
+  if (
+    nextElement &&
+    activeElement === nextElement.previousElementSibling ||
+    activeElement === nextElement
+  ) {
+    // if no need to replace return
+    return;
+  }
 
   // insert activeElement before nextElement
   tasksListElement.insertBefore(activeElement, nextElement);
 });
+
+const getNextElement = (cursorPosition, currentElement) => {
+  // get elem with coordinates and position
+  const currentElementCoord = currentElement.getBoundingClientRect();
+  // get vertical (y) position of center of elem
+  const currentElementCenter = currentElementCoord.y + currentElementCoord.height / 2;
+
+  // if cursor position is higher than center of elem return current elem
+  // else return next sibling
+  const nextElement = (cursorPosition < currentElementCenter) ?
+    currentElement :
+    currentElement.nextElementSibling;
+
+  return nextElement;
+};
